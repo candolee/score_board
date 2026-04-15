@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>배드민턴 점수판</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 헤더 (제목 및 세트 선택) -->
+        <header class="scoreboard-header">
+            <h1 class="title">배드민턴 점수판</h1>
+            <div class="set-indicator">
+                <span class="set-label">현재 세트:</span>
+                <select id="current-set-selector" aria-label="세트 선택">
+                    <option value="1">1 세트</option>
+                    <option value="2">2 세트</option>
+                    <option value="3">3 세트</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- 메인 스코어보드 영역 -->
+        <main class="scoreboard-main">
+            <!-- A팀 -->
+            <div class="team-card team-a">
+                <div class="team-header">
+                    <input type="text" class="team-name-input" id="teamA-name" value="TEAM A" placeholder="팀명">
+                    <div class="players-input">
+                        <input type="text" class="player-input" id="teamA-player1" placeholder="선수 1">
+                        <input type="text" class="player-input" id="teamA-player2" placeholder="선수 2">
+                    </div>
+                </div>
+                
+                <div class="score-display-wrapper" onclick="changeScore('A', 1)">
+                    <div class="serve-indicator" id="serve-indicator-A">🏸 서브권</div>
+                    <div class="score-value" id="score-A">0</div>
+                </div>
+
+                <div class="score-controls">
+                    <button class="btn btn-primary" onclick="changeScore('A', 1)">+ 1</button>
+                    <button class="btn btn-secondary" onclick="changeScore('A', -1)">- 1</button>
+                    <button class="btn btn-serve" onclick="setServe('A')">서브 가져오기</button>
+                </div>
+            </div>
+
+            <!-- VS 구분자 -->
+            <div class="vs-divider">
+                <span>VS</span>
+            </div>
+
+            <!-- B팀 -->
+            <div class="team-card team-b">
+                <div class="team-header reverse">
+                    <div class="players-input">
+                        <input type="text" class="player-input" id="teamB-player1" placeholder="선수 1">
+                        <input type="text" class="player-input" id="teamB-player2" placeholder="선수 2">
+                    </div>
+                    <input type="text" class="team-name-input" id="teamB-name" value="TEAM B" placeholder="팀명">
+                </div>
+                
+                <div class="score-display-wrapper" onclick="changeScore('B', 1)">
+                    <div class="serve-indicator" id="serve-indicator-B">🏸 서브권</div>
+                    <div class="score-value" id="score-B">0</div>
+                </div>
+
+                <div class="score-controls">
+                    <button class="btn btn-primary" onclick="changeScore('B', 1)">+ 1</button>
+                    <button class="btn btn-secondary" onclick="changeScore('B', -1)">- 1</button>
+                    <button class="btn btn-serve" onclick="setServe('B')">서브 가져오기</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- 세트별 기록 탭 -->
+        <section class="game-history">
+            <h2 class="history-title">세트별 점수 기록</h2>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab(1)">1 세트</button>
+                <button class="tab-btn" onclick="switchTab(2)">2 세트</button>
+                <button class="tab-btn" onclick="switchTab(3)">3 세트</button>
+            </div>
+            <div class="tab-content" id="tab-content-container">
+                <!-- Javascript를 통해 내용이 채워집니다. -->
+            </div>
+        </section>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,407 @@
+:root {
+    --bg-gradient-start: #0f172a;
+    --bg-gradient-end: #1e1b4b;
+    --card-bg: rgba(255, 255, 255, 0.05);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --text-primary: #f8fafc;
+    --text-muted: #94a3b8;
+    --text-accent: #38bdf8;
+    --btn-primary-bg: rgba(56, 189, 248, 0.2);
+    --btn-primary-hover: rgba(56, 189, 248, 0.4);
+    --btn-primary-border: #38bdf8;
+    --btn-secondary-bg: rgba(244, 63, 94, 0.1);
+    --btn-secondary-hover: rgba(244, 63, 94, 0.3);
+    --btn-secondary-border: #f43f5e;
+    --btn-serve-bg: rgba(250, 204, 21, 0.2);
+    --btn-serve-hover: rgba(250, 204, 21, 0.4);
+    --btn-serve-border: #facc15;
+    --serve-active: #facc15;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* Header */
+.scoreboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 20px 30px;
+    backdrop-filter: blur(10px);
+    flex-wrap: wrap;
+}
+
+.title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    margin: 0;
+}
+
+.set-indicator {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(0,0,0,0.3);
+    padding: 10px 20px;
+    border-radius: 12px;
+}
+
+.set-label {
+    font-weight: 600;
+    color: var(--text-accent);
+}
+
+#current-set-selector {
+    background: transparent;
+    color: white;
+    border: 1px solid var(--card-border);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+}
+#current-set-selector option {
+    background: var(--bg-gradient-end);
+}
+
+/* Main Scoreboard */
+.scoreboard-main {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.team-card {
+    flex: 1;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 30px;
+    backdrop-filter: blur(12px);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.team-card:hover {
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.team-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.team-header.reverse {
+    justify-content: flex-end;
+}
+
+.team-name-input {
+    font-family: inherit;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: white;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    width: 120px;
+    text-align: center;
+    transition: border-color 0.3s;
+}
+
+.team-name-input:focus {
+    outline: none;
+    border-bottom: 2px solid var(--text-accent);
+}
+
+.players-input {
+    display: flex;
+    gap: 10px;
+}
+
+.player-input {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text-muted);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    width: 100px;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.player-input:focus {
+    outline: none;
+    border-color: var(--text-accent);
+    color: white;
+}
+
+/* Score Display */
+.score-display-wrapper {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.2);
+    border-radius: 16px;
+    padding: 40px 20px;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    border: 2px solid transparent;
+    transition: border-color 0.3s;
+}
+
+.score-display-wrapper:active {
+    transform: scale(0.98);
+}
+
+.serve-indicator {
+    position: absolute;
+    top: 15px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    opacity: 0.2;
+    transition: all 0.3s;
+}
+
+.serve-indicator.active {
+    color: var(--serve-active);
+    opacity: 1;
+    text-shadow: 0 0 10px rgba(250, 204, 21, 0.5);
+    transform: scale(1.1);
+}
+
+.score-value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 8rem;
+    line-height: 1;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    transition: transform 0.2s;
+}
+
+/* Controls */
+.score-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn {
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.btn:active {
+    transform: translateY(2px);
+}
+
+.btn-primary {
+    background: var(--btn-primary-bg);
+    border: 1px solid var(--btn-primary-border);
+    flex: 1;
+}
+.btn-primary:hover { background: var(--btn-primary-hover); }
+
+.btn-secondary {
+    background: var(--btn-secondary-bg);
+    border: 1px solid var(--btn-secondary-border);
+    flex: 1;
+}
+.btn-secondary:hover { background: var(--btn-secondary-hover); }
+
+.btn-serve {
+    background: var(--btn-serve-bg);
+    border: 1px solid var(--btn-serve-border);
+    width: 100%;
+}
+.btn-serve:hover { background: var(--btn-serve-hover); }
+
+/* VS Divider */
+.vs-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+/* Game History */
+.game-history {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 25px;
+    backdrop-filter: blur(10px);
+}
+
+.history-title {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid transparent;
+    color: var(--text-muted);
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.tab-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+.tab-btn.active {
+    background: var(--btn-primary-bg);
+    border-color: var(--btn-primary-border);
+    color: white;
+}
+
+.tab-content {
+    background: rgba(0,0,0,0.2);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+}
+
+.history-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    font-size: 1.1rem;
+}
+
+.history-team {
+    font-weight: 600;
+    width: 30%;
+}
+
+.history-team.left { text-align: right; }
+.history-team.right { text-align: left; }
+
+.history-score {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-accent);
+    padding: 0 20px;
+}
+
+.empty-history {
+    color: var(--text-muted);
+    padding: 20px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .scoreboard-main {
+        flex-direction: column;
+    }
+
+    .vs-divider {
+        padding: 10px 0;
+    }
+
+    .team-header {
+        justify-content: center !important;
+    }
+
+    .team-header.reverse {
+        flex-direction: column-reverse;
+    }
+    
+    /* on mobile adjust so B team also looks cohesive stacked */
+    .team-header.reverse {
+        flex-direction: row;
+    }
+
+    .team-name-input {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .score-value {
+        font-size: 6rem;
+    }
+
+    .history-item {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .history-team {
+        width: 100%;
+        text-align: center !important;
+    }
+}
