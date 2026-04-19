@@ -29,9 +29,15 @@ function changeScore(team, delta) {
     updateDisplay();
 }
 
-// 서브권 설정 함수
-function setServe(team) {
-    state.serveTeam = team;
+// 서브권 토글 함수
+function toggleServe() {
+    if (state.serveTeam === 'A') {
+        state.serveTeam = 'B';
+    } else if (state.serveTeam === 'B') {
+        state.serveTeam = 'A';
+    } else {
+        state.serveTeam = 'A'; // 최초 클릭 시 A팀 서브
+    }
     updateDisplay();
 }
 
@@ -115,16 +121,24 @@ function renderMatchHistory() {
             resultB = '무';
         }
 
-        const playerADisplay = record.playerA ? `<br><span style="font-size: 0.75rem; color: #a1a1aa; font-weight: normal;">${record.playerA}</span>` : '';
-        const playerBDisplay = record.playerB ? `<br><span style="font-size: 0.75rem; color: #a1a1aa; font-weight: normal;">${record.playerB}</span>` : '';
+        const playerAStr = record.playerA ? `<span style="font-size:0.75rem; color:#a1a1aa; font-weight:normal;"> (${record.playerA})</span>` : '';
+        const playerBStr = record.playerB ? `<span style="font-size:0.75rem; color:#a1a1aa; font-weight:normal;"> (${record.playerB})</span>` : '';
 
         html += `
-            <div class="history-item" style="flex-direction: column; align-items: stretch; margin-bottom: 12px; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 12px;">
-                <div style="font-size: 0.8rem; color: #a1a1aa; margin-bottom: 8px; text-align: center;">${record.date}</div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div class="history-team left" style="flex: 1; text-align: right; color: ${colorA}; font-weight: bold;">${record.teamA} <span style="font-size:0.8em">(${resultA})</span>${playerADisplay}</div>
-                    <div class="history-score" style="margin: 0 20px; font-size: 1.4rem; letter-spacing: 2px;">${record.scoreA} : ${record.scoreB}</div>
-                    <div class="history-team right" style="flex: 1; text-align: left; color: ${colorB}; font-weight: bold;"><span style="font-size:0.8em">(${resultB})</span> ${record.teamB}${playerBDisplay}</div>
+            <div class="history-item" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; padding: 10px 15px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                <div style="color: #a1a1aa; margin-right: 15px; white-space: nowrap; font-size: 0.75rem;">
+                    ${record.date}
+                </div>
+                <div style="display: flex; flex: 1; align-items: center; justify-content: center; gap: 10px;">
+                    <div style="text-align: right; flex: 1; color: ${colorA}; font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        ${record.teamA}${playerAStr}
+                    </div>
+                    <div style="font-weight: 800; font-size: 1.1rem; white-space: nowrap; width: 65px; text-align: center; letter-spacing: 1px;">
+                        ${record.scoreA} : ${record.scoreB}
+                    </div>
+                    <div style="text-align: left; flex: 1; color: ${colorB}; font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        ${record.teamB}${playerBStr}
+                    </div>
                 </div>
             </div>
         `;
