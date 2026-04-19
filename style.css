@@ -363,8 +363,8 @@ body {
     padding: 20px;
 }
 
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
+/* Mobile Responsiveness (Portrait) */
+@media (max-width: 768px) and (orientation: portrait) {
     .scoreboard-main {
         flex-direction: column;
     }
@@ -377,11 +377,6 @@ body {
         justify-content: center !important;
     }
 
-    .team-header.reverse {
-        flex-direction: column-reverse;
-    }
-    
-    /* on mobile adjust so B team also looks cohesive stacked */
     .team-header.reverse {
         flex-direction: row;
     }
@@ -403,5 +398,69 @@ body {
     .history-team {
         width: 100%;
         text-align: center !important;
+    }
+}
+
+/* Mobile Responsiveness (Landscape) - Fit to screen */
+@media (max-height: 600px) and (orientation: landscape) {
+    body {
+        padding: 10px;
+        align-items: flex-start; /* Prevent cut off at top */
+    }
+    .app-container {
+        gap: 10px;
+    }
+    .team-card {
+        padding: 10px 15px;
+        gap: 10px;
+    }
+    .team-header {
+        gap: 10px;
+        justify-content: center;
+    }
+    .team-name-input {
+        font-size: 1.1rem;
+        width: 80px;
+        margin: 0;
+    }
+    .player-input {
+        padding: 4px 6px;
+        font-size: 0.8rem;
+        width: 70px;
+    }
+    .score-display-wrapper {
+        padding: 15px 20px;
+    }
+    .score-value {
+        font-size: 4.5rem;
+    }
+    .serve-indicator {
+        font-size: 0.8rem;
+        top: 5px;
+    }
+    .score-controls {
+        gap: 5px;
+    }
+    .btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+    .vs-divider {
+        gap: 5px !important;
+    }
+    .vs-divider span {
+        font-size: 1rem !important;
+    }
+    .vs-divider button {
+        padding: 4px 12px !important;
+        font-size: 0.8rem !important;
+    }
+    .game-history {
+        padding: 15px;
+        margin-top: 5px;
+    }
+    .history-title {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
     }
 }
