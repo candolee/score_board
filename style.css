@@ -60,7 +60,7 @@ body {
     font-size: 1.8rem;
     font-weight: 800;
     color: var(--text-primary);
-    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     margin: 0;
 }
 
@@ -68,7 +68,7 @@ body {
     display: flex;
     align-items: center;
     gap: 15px;
-    background: rgba(0,0,0,0.3);
+    background: rgba(0, 0, 0, 0.3);
     padding: 10px 20px;
     border-radius: 12px;
 }
@@ -89,6 +89,7 @@ body {
     outline: none;
     cursor: pointer;
 }
+
 #current-set-selector option {
     background: var(--bg-gradient-end);
 }
@@ -115,7 +116,7 @@ body {
 }
 
 .team-card:hover {
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .team-header {
@@ -153,8 +154,8 @@ body {
 }
 
 .player-input {
-    background: rgba(0,0,0,0.2);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     color: var(--text-muted);
     padding: 8px 12px;
     border-radius: 8px;
@@ -177,7 +178,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: rgba(0,0,0,0.2);
+    background: rgba(0, 0, 0, 0.2);
     border-radius: 16px;
     padding: 40px 20px;
     cursor: pointer;
@@ -212,7 +213,7 @@ body {
     font-family: 'Orbitron', sans-serif;
     font-size: 8rem;
     line-height: 1;
-    text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     transition: transform 0.2s;
 }
 
@@ -247,21 +248,30 @@ body {
     border: 1px solid var(--btn-primary-border);
     flex: 1;
 }
-.btn-primary:hover { background: var(--btn-primary-hover); }
+
+.btn-primary:hover {
+    background: var(--btn-primary-hover);
+}
 
 .btn-secondary {
     background: var(--btn-secondary-bg);
     border: 1px solid var(--btn-secondary-border);
     flex: 1;
 }
-.btn-secondary:hover { background: var(--btn-secondary-hover); }
+
+.btn-secondary:hover {
+    background: var(--btn-secondary-hover);
+}
 
 .btn-serve {
     background: var(--btn-serve-bg);
     border: 1px solid var(--btn-serve-border);
-    width: 100%;
+    width: 65px;
 }
-.btn-serve:hover { background: var(--btn-serve-hover); }
+
+.btn-serve:hover {
+    background: var(--btn-serve-hover);
+}
 
 /* VS Divider */
 .vs-divider {
@@ -297,7 +307,7 @@ body {
 }
 
 .tab-btn {
-    background: rgba(0,0,0,0.3);
+    background: rgba(0, 0, 0, 0.3);
     border: 1px solid transparent;
     color: var(--text-muted);
     padding: 10px 20px;
@@ -308,7 +318,7 @@ body {
 }
 
 .tab-btn:hover {
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
     color: white;
 }
 
@@ -319,7 +329,7 @@ body {
 }
 
 .tab-content {
-    background: rgba(0,0,0,0.2);
+    background: rgba(0, 0, 0, 0.2);
     border-radius: 12px;
     padding: 20px;
     text-align: center;
@@ -337,7 +347,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 15px;
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 8px;
     font-size: 1.1rem;
 }
@@ -347,8 +357,13 @@ body {
     width: 30%;
 }
 
-.history-team.left { text-align: right; }
-.history-team.right { text-align: left; }
+.history-team.left {
+    text-align: right;
+}
+
+.history-team.right {
+    text-align: left;
+}
 
 .history-score {
     font-family: 'Orbitron', sans-serif;
@@ -394,7 +409,7 @@ body {
         flex-direction: column;
         gap: 10px;
     }
-    
+
     .history-team {
         width: 100%;
         text-align: center !important;
@@ -405,60 +420,76 @@ body {
 @media (max-height: 600px) and (orientation: landscape) {
     body {
         padding: 10px;
-        align-items: flex-start; /* Prevent cut off at top */
+        align-items: flex-start;
+        /* Prevent cut off at top */
     }
+
     .app-container {
         gap: 10px;
     }
+
     .team-card {
         padding: 10px 15px;
         gap: 10px;
     }
+
     .team-header {
         gap: 10px;
         justify-content: center;
     }
+
     .team-name-input {
         font-size: 1.1rem;
         width: 80px;
         margin: 0;
     }
+
     .player-input {
         padding: 4px 6px;
         font-size: 0.8rem;
         width: 70px;
     }
+
     .score-display-wrapper {
         padding: 15px 20px;
     }
+
     .score-value {
         font-size: 4.5rem;
     }
+
     .serve-indicator {
         font-size: 0.8rem;
         top: 5px;
     }
+
     .score-controls {
         gap: 5px;
     }
+
     .btn {
         padding: 6px 12px;
         font-size: 0.8rem;
     }
+
     .vs-divider {
         gap: 5px !important;
     }
+
     .vs-divider span {
         font-size: 1rem !important;
     }
+
     .vs-divider button {
         padding: 4px 12px !important;
         font-size: 0.8rem !important;
     }
+
     .game-history {
         padding: 15px;
         margin-top: 5px;
     }
+
     .history-title {
         font-size: 1.1rem;
         margin-bottom: 10px;
