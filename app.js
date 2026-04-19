@@ -195,6 +195,16 @@ function renderMatchHistory(query = '') {
     matchHistoryContainer.innerHTML = html;
 }
 
+// 경기기록 화면 토글 함수
+function toggleHistory() {
+    const historySection = document.getElementById('game-history-section');
+    if (historySection.style.display === 'none') {
+        historySection.style.display = 'block';
+    } else {
+        historySection.style.display = 'none';
+    }
+}
+
 // 초기화
 updateDisplay();
 renderMatchHistory();
