@@ -14,14 +14,7 @@
         <!-- 헤더 (제목 및 세트 선택) -->
         <header class="scoreboard-header">
             <h1 class="title">배드민턴 점수판</h1>
-            <div class="set-indicator">
-                <span class="set-label">현재 세트:</span>
-                <select id="current-set-selector" aria-label="세트 선택">
-                    <option value="1">1 세트</option>
-                    <option value="2">2 세트</option>
-                    <option value="3">3 세트</option>
-                </select>
-            </div>
+
         </header>
 
         <!-- 메인 스코어보드 영역 -->
@@ -76,16 +69,15 @@
             </div>
         </main>
 
-        <!-- 세트별 기록 탭 -->
+        <!-- 경기 기록 -->
         <section class="game-history">
-            <h2 class="history-title">세트별 점수 기록</h2>
-            <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab(1)">1 세트</button>
-                <button class="tab-btn" onclick="switchTab(2)">2 세트</button>
-                <button class="tab-btn" onclick="switchTab(3)">3 세트</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 class="history-title" style="margin-bottom: 0;">경기 기록 (일자별)</h2>
+                <button class="btn btn-secondary" onclick="endGame()" style="padding: 8px 16px; font-size: 0.9rem;">게임 종료 및 저장</button>
             </div>
-            <div class="tab-content" id="tab-content-container">
-                <!-- Javascript를 통해 내용이 채워집니다. -->
+            <div class="history-list" id="match-history-container">
+                <!-- Javascript를 통해 일자별 경기 기록이 렌더링됩니다. -->
+                <div class="empty-history">아직 기록된 경기가 없습니다.</div>
             </div>
         </section>
     </div>
