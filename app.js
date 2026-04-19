@@ -26,6 +26,11 @@ function changeScore(team, delta) {
         state.score[team] = 0;
     }
 
+    // 득점 시 해당 팀으로 서브권 자동 변경
+    if (delta > 0) {
+        state.serveTeam = team;
+    }
+
     updateDisplay();
 }
 
@@ -92,15 +97,58 @@ function endGame() {
     renderMatchHistory();
 }
 
+// 새로운 게임 기록을 위한 초기화
+function resetGame() {
+    if (state.score.A > 0 || state.score.B > 0) {
+        if (!confirm('현재 점수가 초기화됩니다. 새 게임을 시작하시겠습니까?')) {
+            return;
+        }
+    }
+    
+    // 점수 및 서브권 초기화
+    state.score.A = 0;
+    state.score.B = 0;
+    state.serveTeam = null;
+
+    // 선수 이름 및 팀명 초기화
+    teamANameInput.value = 'A팀';
+    teamBNameInput.value = 'B팀';
+    teamAPlayer1Input.value = '';
+    teamAPlayer2Input.value = '';
+    teamBPlayer1Input.value = '';
+    teamBPlayer2Input.value = '';
+
+    updateDisplay();
+}
+
 // 일자별 기록 화면 렌더링
-function renderMatchHistory() {
-    if (state.matchHistory.length === 0) {
-        matchHistoryContainer.innerHTML = '<div class="empty-history">아직 기록된 경기가 없습니다.</div>';
+function renderMatchHistory(query = '') {
+    const searchInput = document.getElementById('search-player-input');
+    const searchTerm = query || (searchInput ? searchInput.value : '');
+    
+    let historyToRender = state.matchHistory;
+    
+    if (searchTerm.trim() !== '') {
+        const lowerTerm = searchTerm.trim().toLowerCase();
+        historyToRender = state.matchHistory.filter(record => 
+            (record.playerA && record.playerA.toLowerCase().includes(lowerTerm)) || 
+            (record.playerB && record.playerB.toLowerCase().includes(lowerTerm)) ||
+            (record.teamA && record.teamA.toLowerCase().includes(lowerTerm)) ||
+            (record.teamB && record.teamB.toLowerCase().includes(lowerTerm))
+        );
+    }
+
+    if (historyToRender.length === 0) {
+        if (state.matchHistory.length === 0) {
+            matchHistoryContainer.innerHTML = '<div class="empty-history">아직 기록된 경기가 없습니다.</div>';
+        } else {
+            matchHistoryContainer.innerHTML = '<div class="empty-history">검색 조건과 일치하는 기록이 없습니다.</div>';
+        }
         return;
     }
 
     let html = '';
-    state.matchHistory.forEach(record => {
+    historyToRender.forEach(record => {
         let resultA = '-';
         let resultB = '-';
         let colorA = '#fff';
