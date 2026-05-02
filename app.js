@@ -1,7 +1,26 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, updateDoc, query, orderBy, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    projectId: "scordboard",
+    appId: "1:30546922123:web:375c502f5213ca9de8228e",
+    storageBucket: "scordboard.firebasestorage.app",
+    apiKey: "AIzaSyA7Ks3Iftl0OQfYEM-fMdqbPvk7Os5kbmA",
+    authDomain: "scordboard.firebaseapp.com",
+    messagingSenderId: "30546922123"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
 const state = {
     serveTeam: null,
     score: { A: 0, B: 0 },
-    matchHistory: []
+    matchHistory: [],
+    currentUser: null,
+    unsubscribeSnapshot: null
 };
 
 // DOM 요소를 가져옵니다.
@@ -16,17 +35,135 @@ const teamAPlayer2Input = document.getElementById('teamA-player2');
 const teamBPlayer1Input = document.getElementById('teamB-player1');
 const teamBPlayer2Input = document.getElementById('teamB-player2');
 const matchHistoryContainer = document.getElementById('match-history-container');
+const loginBtn = document.getElementById('login-btn');
+const logoutBtn = document.getElementById('logout-btn');
+const userInfo = document.getElementById('user-info');
+const userEmail = document.getElementById('user-email');
+const searchInput = document.getElementById('search-player-input');
+
+// 검색 이벤트 리스너 추가
+if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+        renderMatchHistory(e.target.value);
+    });
+}
+
+// ------ 인증 관리 ------
+
+const provider = new GoogleAuthProvider();
+
+loginBtn.addEventListener('click', async () => {
+    try {
+        await signInWithPopup(auth, provider);
+    } catch (error) {
+        console.error("Login failed", error);
+        alert('로그인에 실패했습니다.');
+    }
+});
+
+logoutBtn.addEventListener('click', async () => {
+    try {
+        await signOut(auth);
+    } catch (error) {
+        console.error("Logout failed", error);
+    }
+});
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        state.currentUser = user;
+        loginBtn.style.display = 'none';
+        userInfo.style.display = 'flex';
+        userEmail.textContent = user.email;
+        loadUserMatches(user.uid);
+    } else {
+        state.currentUser = null;
+        loginBtn.style.display = 'block';
+        userInfo.style.display = 'none';
+        state.matchHistory = [];
+        if (state.unsubscribeSnapshot) {
+            state.unsubscribeSnapshot();
+            state.unsubscribeSnapshot = null;
+        }
+        renderMatchHistory();
+    }
+});
+
+// ------ 데이터베이스 (Firestore) 관리 ------
+
+function loadUserMatches(uid) {
+    const matchesRef = collection(db, "users", uid, "matches");
+    const q = query(matchesRef, orderBy("timestamp", "desc"));
+    
+    // 실시간 감지
+    state.unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
+        state.matchHistory = [];
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            state.matchHistory.push({
+                id: doc.id,
+                ...data
+            });
+        });
+        renderMatchHistory(searchInput ? searchInput.value : '');
+    }, (error) => {
+        console.error("Error fetching matches", error);
+        alert('데이터를 불러오는데 실패했습니다.');
+    });
+}
+
+async function deleteMatch(matchId) {
+    if (!state.currentUser) return;
+    if (!confirm('이 기록을 삭제하시겠습니까?')) return;
+    
+    try {
+        await deleteDoc(doc(db, "users", state.currentUser.uid, "matches", matchId));
+    } catch (error) {
+        console.error("Error deleting match", error);
+        alert('기록 삭제에 실패했습니다.');
+    }
+}
+window.deleteMatch = deleteMatch; // 전역 스코프에 노출
+
+async function editMatch(matchId, currentScoreA, currentScoreB) {
+    if (!state.currentUser) return;
+    
+    const newScoreA = prompt('A팀의 점수를 수정하세요:', currentScoreA);
+    if (newScoreA === null) return;
+    
+    const newScoreB = prompt('B팀의 점수를 수정하세요:', currentScoreB);
+    if (newScoreB === null) return;
+    
+    const parsedA = parseInt(newScoreA, 10);
+    const parsedB = parseInt(newScoreB, 10);
+    
+    if (isNaN(parsedA) || isNaN(parsedB) || parsedA < 0 || parsedB < 0) {
+        alert('올바른 숫자를 입력해주세요.');
+        return;
+    }
+    
+    try {
+        await updateDoc(doc(db, "users", state.currentUser.uid, "matches", matchId), {
+            scoreA: parsedA,
+            scoreB: parsedB
+        });
+    } catch (error) {
+        console.error("Error updating match", error);
+        alert('기록 수정에 실패했습니다.');
+    }
+}
+window.editMatch = editMatch;
+
+// ------ 게임 로직 ------
 
 // 점수 증감 함수
 function changeScore(team, delta) {
     state.score[team] += delta;
 
-    // 점수는 0 이하로 내려가지 않음
     if (state.score[team] < 0) {
         state.score[team] = 0;
     }
 
-    // 득점 시 해당 팀으로 서브권 자동 변경
     if (delta > 0) {
         state.serveTeam = team;
     }
@@ -34,19 +171,17 @@ function changeScore(team, delta) {
     updateDisplay();
 }
 
-// 서브권 토글 함수
 function toggleServe() {
     if (state.serveTeam === 'A') {
         state.serveTeam = 'B';
     } else if (state.serveTeam === 'B') {
         state.serveTeam = 'A';
     } else {
-        state.serveTeam = 'A'; // 최초 클릭 시 A팀 서브
+        state.serveTeam = 'A';
     }
     updateDisplay();
 }
 
-// 화면 업데이트 (점수 및 서브권 표시)
 function updateDisplay() {
     scoreAEl.textContent = state.score.A;
     scoreBEl.textContent = state.score.B;
@@ -63,10 +198,14 @@ function updateDisplay() {
     }
 }
 
-// 게임 종료 및 기록 저장
-function endGame() {
+async function endGame() {
     if (state.score.A === 0 && state.score.B === 0) {
         alert('점수를 먼저 기록해주세요.');
+        return;
+    }
+
+    if (!state.currentUser) {
+        alert('기록을 저장하려면 로그인이 필요합니다.');
         return;
     }
 
@@ -78,6 +217,7 @@ function endGame() {
 
     const record = {
         date: dateString,
+        timestamp: today.getTime(), // 정렬용
         teamA: teamANameInput.value || 'TEAM A',
         teamB: teamBNameInput.value || 'TEAM B',
         playerA: playerA,
@@ -86,18 +226,23 @@ function endGame() {
         scoreB: state.score.B
     };
 
-    state.matchHistory.unshift(record); // 최신 기록을 상단에 추가
+    // Firebase에 저장
+    try {
+        const matchesRef = collection(db, "users", state.currentUser.uid, "matches");
+        await addDoc(matchesRef, record);
+    } catch (error) {
+        console.error("Error saving match", error);
+        alert("기록 저장 중 오류가 발생했습니다.");
+        return;
+    }
 
-    // 점수 및 서브권 초기화
+    // 화면 초기화
     state.score.A = 0;
     state.score.B = 0;
     state.serveTeam = null;
-
     updateDisplay();
-    renderMatchHistory();
 }
 
-// 새로운 게임 기록을 위한 초기화
 function resetGame() {
     if (state.score.A > 0 || state.score.B > 0) {
         if (!confirm('현재 점수가 초기화됩니다. 새 게임을 시작하시겠습니까?')) {
@@ -105,12 +250,10 @@ function resetGame() {
         }
     }
     
-    // 점수 및 서브권 초기화
     state.score.A = 0;
     state.score.B = 0;
     state.serveTeam = null;
 
-    // 선수 이름 및 팀명 초기화
     teamANameInput.value = 'A팀';
     teamBNameInput.value = 'B팀';
     teamAPlayer1Input.value = '';
@@ -121,9 +264,7 @@ function resetGame() {
     updateDisplay();
 }
 
-// 일자별 기록 화면 렌더링
 function renderMatchHistory(query = '') {
-    const searchInput = document.getElementById('search-player-input');
     const searchTerm = query || (searchInput ? searchInput.value : '');
     
     let historyToRender = state.matchHistory;
@@ -138,9 +279,14 @@ function renderMatchHistory(query = '') {
         );
     }
 
+    if (!state.currentUser) {
+        matchHistoryContainer.innerHTML = '<div class="empty-history">아직 기록된 경기가 없습니다. (로그인 후 이용 가능)</div>';
+        return;
+    }
+
     if (historyToRender.length === 0) {
         if (state.matchHistory.length === 0) {
-            matchHistoryContainer.innerHTML = '<div class="empty-history">아직 기록된 경기가 없습니다.</div>';
+            matchHistoryContainer.innerHTML = '<div class="empty-history">기록된 경기가 없습니다. 첫 번째 게임을 기록해보세요!</div>';
         } else {
             matchHistoryContainer.innerHTML = '<div class="empty-history">검색 조건과 일치하는 기록이 없습니다.</div>';
         }
@@ -157,23 +303,20 @@ function renderMatchHistory(query = '') {
         if (record.scoreA > record.scoreB) {
             resultA = '승';
             resultB = '패';
-            colorA = '#4ade80'; // 녹색
-            colorB = '#ef4444'; // 빨간색
+            colorA = '#4ade80';
+            colorB = '#ef4444';
         } else if (record.scoreA < record.scoreB) {
             resultA = '패';
             resultB = '승';
             colorA = '#ef4444';
             colorB = '#4ade80';
-        } else {
-            resultA = '무';
-            resultB = '무';
         }
 
         const playerAStr = record.playerA ? `<span style="font-size:0.75rem; color:#a1a1aa; font-weight:normal;"> (${record.playerA})</span>` : '';
         const playerBStr = record.playerB ? `<span style="font-size:0.75rem; color:#a1a1aa; font-weight:normal;"> (${record.playerB})</span>` : '';
 
         html += `
-            <div class="history-item" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; padding: 10px 15px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+            <div class="history-item" style="display: flex; align-items: center; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; padding: 10px 15px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; position: relative;">
                 <div style="color: #a1a1aa; margin-right: 15px; white-space: nowrap; font-size: 0.75rem;">
                     ${record.date}
                 </div>
@@ -188,6 +331,16 @@ function renderMatchHistory(query = '') {
                         ${record.teamB}${playerBStr}
                     </div>
                 </div>
+                <div style="display: flex; gap: 5px; margin-left: 10px;">
+                    <!-- 수정 버튼 -->
+                    <button onclick="editMatch('${record.id}', ${record.scoreA}, ${record.scoreB})" title="점수 수정" style="background: none; border: none; color: #38bdf8; font-size: 0.9rem; cursor: pointer; padding: 5px;">
+                        ✏️
+                    </button>
+                    <!-- 삭제 버튼 -->
+                    <button onclick="deleteMatch('${record.id}')" title="기록 삭제" style="background: none; border: none; color: #ef4444; font-size: 1rem; cursor: pointer; padding: 5px;">
+                        &times;
+                    </button>
+                </div>
             </div>
         `;
     });
@@ -195,7 +348,6 @@ function renderMatchHistory(query = '') {
     matchHistoryContainer.innerHTML = html;
 }
 
-// 경기기록 화면 토글 함수
 function toggleHistory() {
     const historySection = document.getElementById('game-history-section');
     if (historySection.style.display === 'none') {
@@ -205,6 +357,15 @@ function toggleHistory() {
     }
 }
 
-// 초기화
+// window에 게임 컨트롤 함수들 노출시켜서 HTML의 inline 이벤트에서 사용할 수 있게 함
+window.gameControls = {
+    changeScore,
+    toggleServe,
+    endGame,
+    resetGame,
+    toggleHistory
+};
+
 updateDisplay();
 renderMatchHistory();
+
